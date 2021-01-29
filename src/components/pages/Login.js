@@ -11,11 +11,34 @@ import {
 } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 import logo from "../../logo.png";
 
 export default function Login() {
   const { Title, Text } = Typography;
+
+  const BgShape = styled.div`
+    position: absolute;
+    top: ${(props) => props.top};
+    left: ${(props) => props.left};
+    bottom: ${(props) => props.bottom};
+    right: ${(props) => props.right};
+    border-radius: 25px;
+  `;
+
+  const PurpleShape = styled(BgShape)`
+    width: 200px;
+    height: 200px;
+    background-color: #f2f2f8;
+  `;
+
+  const TranspShape = styled(BgShape)`
+    width: ${(props) => props.width || "150px"};
+    height: ${(props) => props.height || "150px"};
+    border: ${(props) => "2px " + (props.borderStyle || "solid") + " #ebeaf7"};
+  `;
+
   return (
     <Row
       gutter={[24, 24]}
@@ -29,6 +52,8 @@ export default function Login() {
         md={12}
         lg={7}
         style={{
+          padding: "0px",
+          position: "relative",
           backgroundColor: "#fff",
           WebkitBoxShadow: "0px 0px 15px 5px rgba(232,232,232,1)",
           MozBoxShadow: "0px 0px 15px 5px rgba(232,232,232,1)",
@@ -36,10 +61,24 @@ export default function Login() {
           borderRadius: "8px",
         }}
       >
-        <Card bordered={false}>
+        <PurpleShape top="-50px" left="-50px" />
+        <PurpleShape bottom="-50px" right="-50px" />
+        <TranspShape top="-75px" left="25px" />
+        <TranspShape
+          bottom="-75px"
+          width="250px"
+          height="250px"
+          right="-75px"
+          borderStyle="dashed"
+        />
+        <Card bordered={false} style={{ borderRadius: "8px" }}>
           <Space direction="vertical" size="large">
             <Image preview={false} src={logo} />
-            <Title level={4} type="secondary">
+            <Title
+              level={4}
+              type="secondary"
+              style={{ marginBottom: "0.15em" }}
+            >
               Welcome to ERP Data Scan!
             </Title>
           </Space>
@@ -50,7 +89,7 @@ export default function Login() {
             name="login-form"
             layout="vertical"
             requiredMark={false}
-            style={{ marginTop: "24px" }}
+            style={{ marginTop: "16px" }}
           >
             <Form.Item
               label={
@@ -65,6 +104,7 @@ export default function Login() {
                   message: "Please input your username!",
                 },
               ]}
+              style={{ marginBottom: "16px" }}
             >
               <Input />
             </Form.Item>
@@ -84,7 +124,7 @@ export default function Login() {
             >
               <Input.Password />
             </Form.Item>
-            <Form.Item>
+            <Form.Item style={{ marginBottom: "16px" }}>
               <Button
                 type="primary"
                 htmlType="submit"
