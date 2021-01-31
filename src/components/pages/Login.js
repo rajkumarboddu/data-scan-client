@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Row,
   Col,
@@ -8,36 +9,81 @@ import {
   Form,
   Input,
   Button,
+  Alert,
 } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 
 import logo from "../../logo.png";
 
+const BgShape = styled.div`
+  position: absolute;
+  top: ${(props) => props.top};
+  left: ${(props) => props.left};
+  bottom: ${(props) => props.bottom};
+  right: ${(props) => props.right};
+  border-radius: 25px;
+`;
+
+const PurpleShape = styled(BgShape)`
+  width: 200px;
+  height: 200px;
+  background-color: #f2f2f8;
+`;
+
+const TranspShape = styled(BgShape)`
+  width: ${(props) => props.width || "150px"};
+  height: ${(props) => props.height || "150px"};
+  border: ${(props) => "2px " + (props.borderStyle || "solid") + " #ebeaf7"};
+`;
+
+const StyledButton = styled(Button)`
+  font-weight: bold;
+  &.ant-btn-primary {
+    width: 100%;
+    background: #28c76f;
+    border-color: #28c76f;
+  }
+  &.ant-btn-primary[disabled] {
+    color: white;
+    &:hover {
+      background: #28c76f;
+      border-color: #28c76f;
+    }
+  }
+`;
+
+const StyledCol = styled(Col)`
+  position: relative;
+  background-color: #fff;
+  -webkit-box-shadow: 0px 0px 15px 5px rgba(232, 232, 232, 1);
+  -moz-box-shadow: 0px 0px 15px 5px rgba(232, 232, 232, 1);
+  box-shadow: 0px 0px 15px 5px rgba(232, 232, 232, 1);
+  border-radius: 8px;
+`;
+
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState("");
+  const history = useHistory();
   const { Title, Text } = Typography;
 
-  const BgShape = styled.div`
-    position: absolute;
-    top: ${(props) => props.top};
-    left: ${(props) => props.left};
-    bottom: ${(props) => props.bottom};
-    right: ${(props) => props.right};
-    border-radius: 25px;
-  `;
-
-  const PurpleShape = styled(BgShape)`
-    width: 200px;
-    height: 200px;
-    background-color: #f2f2f8;
-  `;
-
-  const TranspShape = styled(BgShape)`
-    width: ${(props) => props.width || "150px"};
-    height: ${(props) => props.height || "150px"};
-    border: ${(props) => "2px " + (props.borderStyle || "solid") + " #ebeaf7"};
-  `;
+  const onSubmit = () => {
+    setError("");
+    setInProgress(true);
+    setTimeout(() => {
+      if (username === "admin" && password === "admin") {
+        localStorage.setItem("accessToken", "some-random-access-token");
+        history.push("/dashboard");
+      } else {
+        setError("Invalid credentials");
+        setInProgress(false);
+      }
+    }, 2000);
+  };
 
   return (
     <Row
@@ -46,21 +92,7 @@ export default function Login() {
       align="middle"
       style={{ height: "100vh", backgroundColor: "#f8f8f8" }}
     >
-      <Col
-        xs={20}
-        sm={16}
-        md={12}
-        lg={7}
-        style={{
-          padding: "0px",
-          position: "relative",
-          backgroundColor: "#fff",
-          WebkitBoxShadow: "0px 0px 15px 5px rgba(232,232,232,1)",
-          MozBoxShadow: "0px 0px 15px 5px rgba(232,232,232,1)",
-          boxShadow: "0px 0px 15px 5px rgba(232,232,232,1)",
-          borderRadius: "8px",
-        }}
-      >
+      <StyledCol xs={20} sm={16} md={12} lg={7} style={{ padding: "0px" }}>
         <PurpleShape top="-50px" left="-50px" />
         <PurpleShape bottom="-50px" right="-50px" />
         <TranspShape top="-75px" left="25px" />
@@ -85,6 +117,14 @@ export default function Login() {
           <Text type="secondary">
             Please sign-in to your account and start the services
           </Text>
+          {error && (
+            <Alert
+              message={error}
+              style={{ marginTop: "8px" }}
+              type="error"
+              showIcon
+            />
+          )}
           <Form
             name="login-form"
             layout="vertical"
@@ -106,7 +146,10 @@ export default function Login() {
               ]}
               style={{ marginBottom: "16px" }}
             >
-              <Input />
+              <Input
+                disabled={inProgress}
+                onChange={(event) => setUsername(event.target.value)}
+              />
             </Form.Item>
             <Form.Item
               label={
@@ -122,20 +165,21 @@ export default function Login() {
                 },
               ]}
             >
-              <Input.Password />
+              <Input.Password
+                disabled={inProgress}
+                onChange={(event) => setPassword(event.target.value)}
+              />
             </Form.Item>
             <Form.Item style={{ marginBottom: "16px" }}>
-              <Button
+              <StyledButton
                 type="primary"
                 htmlType="submit"
-                style={{
-                  width: "100%",
-                  backgroundColor: "#28c76f",
-                  borderColor: "#28c76f",
-                }}
+                onClick={onSubmit}
+                disabled={inProgress}
+                loading={inProgress}
               >
-                SUBMIT
-              </Button>
+                {!inProgress && "SUBMIT"}
+              </StyledButton>
             </Form.Item>
           </Form>
           <Link
@@ -146,7 +190,7 @@ export default function Login() {
             Forgot username/password
           </Link>
         </Card>
-      </Col>
+      </StyledCol>
     </Row>
   );
 }
