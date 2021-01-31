@@ -1,42 +1,10 @@
 import { useState } from "react";
-import {
-  Row,
-  Col,
-  Card,
-  Image,
-  Typography,
-  Space,
-  Form,
-  Input,
-  Button,
-  Alert,
-} from "antd";
+import { Typography, Form, Input, Button, Alert } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 
-import logo from "../../logo.png";
-
-const BgShape = styled.div`
-  position: absolute;
-  top: ${(props) => props.top};
-  left: ${(props) => props.left};
-  bottom: ${(props) => props.bottom};
-  right: ${(props) => props.right};
-  border-radius: 25px;
-`;
-
-const PurpleShape = styled(BgShape)`
-  width: 200px;
-  height: 200px;
-  background-color: #f2f2f8;
-`;
-
-const TranspShape = styled(BgShape)`
-  width: ${(props) => props.width || "150px"};
-  height: ${(props) => props.height || "150px"};
-  border: ${(props) => "2px " + (props.borderStyle || "solid") + " #ebeaf7"};
-`;
+import CenteredCard from "../core/CenteredCard";
 
 const StyledButton = styled(Button)`
   font-weight: bold;
@@ -52,15 +20,6 @@ const StyledButton = styled(Button)`
       border-color: #28c76f;
     }
   }
-`;
-
-const StyledCol = styled(Col)`
-  position: relative;
-  background-color: #fff;
-  -webkit-box-shadow: 0px 0px 15px 5px rgba(232, 232, 232, 1);
-  -moz-box-shadow: 0px 0px 15px 5px rgba(232, 232, 232, 1);
-  box-shadow: 0px 0px 15px 5px rgba(232, 232, 232, 1);
-  border-radius: 8px;
 `;
 
 export default function Login() {
@@ -86,111 +45,85 @@ export default function Login() {
   };
 
   return (
-    <Row
-      gutter={[24, 24]}
-      justify="center"
-      align="middle"
-      style={{ height: "100vh", backgroundColor: "#f8f8f8" }}
-    >
-      <StyledCol xs={20} sm={16} md={12} lg={7} style={{ padding: "0px" }}>
-        <PurpleShape top="-50px" left="-50px" />
-        <PurpleShape bottom="-50px" right="-50px" />
-        <TranspShape top="-75px" left="25px" />
-        <TranspShape
-          bottom="-75px"
-          width="250px"
-          height="250px"
-          right="-75px"
-          borderStyle="dashed"
+    <CenteredCard>
+      <Title level={4} type="secondary" style={{ marginBottom: "0.15em" }}>
+        Welcome to ERP Data Scan!
+      </Title>
+      <Text type="secondary">
+        Please sign-in to your account and start the services
+      </Text>
+      {error && (
+        <Alert
+          message={error}
+          style={{ marginTop: "8px" }}
+          type="error"
+          showIcon
         />
-        <Card bordered={false} style={{ borderRadius: "8px" }}>
-          <Space direction="vertical" size="large">
-            <Image preview={false} src={logo} />
-            <Title
-              level={4}
-              type="secondary"
-              style={{ marginBottom: "0.15em" }}
-            >
-              Welcome to ERP Data Scan!
-            </Title>
-          </Space>
-          <Text type="secondary">
-            Please sign-in to your account and start the services
-          </Text>
-          {error && (
-            <Alert
-              message={error}
-              style={{ marginTop: "8px" }}
-              type="error"
-              showIcon
-            />
-          )}
-          <Form
-            name="login-form"
-            layout="vertical"
-            requiredMark={false}
-            style={{ marginTop: "16px" }}
+      )}
+      <Form
+        name="login-form"
+        layout="vertical"
+        requiredMark={false}
+        style={{ marginTop: "16px" }}
+      >
+        <Form.Item
+          label={
+            <>
+              <UserOutlined style={{ marginRight: "5px" }} /> Username
+            </>
+          }
+          name="username"
+          rules={[
+            {
+              required: true,
+              message: "Please input your username!",
+            },
+          ]}
+          style={{ marginBottom: "16px" }}
+        >
+          <Input
+            disabled={inProgress}
+            onChange={(event) => setUsername(event.target.value)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={
+            <>
+              <LockOutlined style={{ marginRight: "5px" }} /> Password
+            </>
+          }
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: "Please input your password!",
+            },
+          ]}
+        >
+          <Input.Password
+            disabled={inProgress}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </Form.Item>
+        <Form.Item style={{ marginBottom: "16px" }}>
+          <StyledButton
+            type="primary"
+            htmlType="submit"
+            onClick={onSubmit}
+            disabled={inProgress}
+            loading={inProgress}
           >
-            <Form.Item
-              label={
-                <>
-                  <UserOutlined style={{ marginRight: "5px" }} /> Username
-                </>
-              }
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your username!",
-                },
-              ]}
-              style={{ marginBottom: "16px" }}
-            >
-              <Input
-                disabled={inProgress}
-                onChange={(event) => setUsername(event.target.value)}
-              />
-            </Form.Item>
-            <Form.Item
-              label={
-                <>
-                  <LockOutlined style={{ marginRight: "5px" }} /> Password
-                </>
-              }
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-              ]}
-            >
-              <Input.Password
-                disabled={inProgress}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </Form.Item>
-            <Form.Item style={{ marginBottom: "16px" }}>
-              <StyledButton
-                type="primary"
-                htmlType="submit"
-                onClick={onSubmit}
-                disabled={inProgress}
-                loading={inProgress}
-              >
-                {!inProgress && "SUBMIT"}
-              </StyledButton>
-            </Form.Item>
-          </Form>
-          <Link
-            style={{ display: "block", textAlign: "center" }}
-            to="/forgot-password"
-            component={Typography.Link}
-          >
-            Forgot username/password
-          </Link>
-        </Card>
-      </StyledCol>
-    </Row>
+            {!inProgress && "SUBMIT"}
+          </StyledButton>
+        </Form.Item>
+      </Form>
+      <Link
+        style={{ display: "block", textAlign: "center" }}
+        to="/forgot-password"
+        component={Typography.Link}
+      >
+        Forgot username/password
+      </Link>
+    </CenteredCard>
   );
 }
