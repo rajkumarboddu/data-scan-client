@@ -1,26 +1,26 @@
 {
   "files": {
     "main.css": "/data-scan-client/static/css/main.ff576dba.chunk.css",
-    "main.js": "/data-scan-client/static/js/main.fb8ea699.chunk.js",
-    "main.js.map": "/data-scan-client/static/js/main.fb8ea699.chunk.js.map",
-    "runtime-main.js": "/data-scan-client/static/js/runtime-main.9d4dc924.js",
-    "runtime-main.js.map": "/data-scan-client/static/js/runtime-main.9d4dc924.js.map",
+    "main.js": "/data-scan-client/static/js/main.d2ad5962.chunk.js",
+    "main.js.map": "/data-scan-client/static/js/main.d2ad5962.chunk.js.map",
+    "runtime-main.js": "/data-scan-client/static/js/runtime-main.9210b7d0.js",
+    "runtime-main.js.map": "/data-scan-client/static/js/runtime-main.9210b7d0.js.map",
     "static/css/2.f3f01324.chunk.css": "/data-scan-client/static/css/2.f3f01324.chunk.css",
-    "static/js/2.1af41e0c.chunk.js": "/data-scan-client/static/js/2.1af41e0c.chunk.js",
-    "static/js/2.1af41e0c.chunk.js.map": "/data-scan-client/static/js/2.1af41e0c.chunk.js.map",
-    "static/js/3.8df84dfd.chunk.js": "/data-scan-client/static/js/3.8df84dfd.chunk.js",
-    "static/js/3.8df84dfd.chunk.js.map": "/data-scan-client/static/js/3.8df84dfd.chunk.js.map",
+    "static/js/2.eec0ee06.chunk.js": "/data-scan-client/static/js/2.eec0ee06.chunk.js",
+    "static/js/2.eec0ee06.chunk.js.map": "/data-scan-client/static/js/2.eec0ee06.chunk.js.map",
+    "static/js/3.383c86e7.chunk.js": "/data-scan-client/static/js/3.383c86e7.chunk.js",
+    "static/js/3.383c86e7.chunk.js.map": "/data-scan-client/static/js/3.383c86e7.chunk.js.map",
     "index.html": "/data-scan-client/index.html",
     "static/css/2.f3f01324.chunk.css.map": "/data-scan-client/static/css/2.f3f01324.chunk.css.map",
     "static/css/main.ff576dba.chunk.css.map": "/data-scan-client/static/css/main.ff576dba.chunk.css.map",
-    "static/js/2.1af41e0c.chunk.js.LICENSE.txt": "/data-scan-client/static/js/2.1af41e0c.chunk.js.LICENSE.txt",
+    "static/js/2.eec0ee06.chunk.js.LICENSE.txt": "/data-scan-client/static/js/2.eec0ee06.chunk.js.LICENSE.txt",
     "static/media/logo.ff36d86d.png": "/data-scan-client/static/media/logo.ff36d86d.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.9d4dc924.js",
+    "static/js/runtime-main.9210b7d0.js",
     "static/css/2.f3f01324.chunk.css",
-    "static/js/2.1af41e0c.chunk.js",
+    "static/js/2.eec0ee06.chunk.js",
     "static/css/main.ff576dba.chunk.css",
-    "static/js/main.fb8ea699.chunk.js"
+    "static/js/main.d2ad5962.chunk.js"
   ]
 }
