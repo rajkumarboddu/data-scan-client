@@ -1,26 +1,10 @@
 import { useState } from "react";
-import { Typography, Form, Input, Button, Alert } from "antd";
+import { Typography, Form, Input, Alert } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useHistory } from "react-router-dom";
-import styled from "styled-components";
 
 import CenteredCard from "../core/CenteredCard";
-
-const StyledButton = styled(Button)`
-  font-weight: bold;
-  &.ant-btn-primary {
-    width: 100%;
-    background: #28c76f;
-    border-color: #28c76f;
-  }
-  &.ant-btn-primary[disabled] {
-    color: white;
-    &:hover {
-      background: #28c76f;
-      border-color: #28c76f;
-    }
-  }
-`;
+import CardButton from "../core/CardButton";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -106,19 +90,19 @@ export default function Login() {
           />
         </Form.Item>
         <Form.Item style={{ marginBottom: "16px" }}>
-          <StyledButton
+          <CardButton
             type="primary"
             htmlType="submit"
             onClick={onSubmit}
-            disabled={inProgress}
             loading={inProgress}
+            block
           >
             {!inProgress && "SUBMIT"}
-          </StyledButton>
+          </CardButton>
         </Form.Item>
       </Form>
       <Link
-        style={{ display: "block", textAlign: "center" }}
+        style={{ display: "block", textAlign: "center", color: "#968ef4" }}
         to="/forgot-password"
         component={Typography.Link}
       >

@@ -53,7 +53,7 @@ export default function CenteredCard(props) {
           borderStyle="dashed"
         />
         <Card bordered={false} style={{ borderRadius: "8px" }}>
-          <Image preview={false} src={logo} />
+          <Image preview={false} src={logo} style={{ marginBottom: "16px" }} />
           {props.children}
         </Card>
       </StyledCol>
