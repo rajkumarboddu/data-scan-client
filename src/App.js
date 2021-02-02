@@ -12,7 +12,7 @@ import ForgotCredentials from "./components/pages/ForgotCredentials";
 
 function App() {
   return (
-    <Router basename={process.env.PUBLIC_URL}>
+    <Router>
       <div className="app">
         <Switch>
           <Route exact path="/">
