@@ -15,18 +15,20 @@ export default function ForgotCredentials() {
   const { Title, Text } = Typography;
 
   const onSubmit = () => {
-    setSuccess("");
-    setError("");
-    setInProgress(true);
-    setTimeout(() => {
-      if (email === "abc@test.com") {
-        setEmail("");
-        setSuccess("Reset password link has been sent to your email");
-      } else {
-        setError("Couldn't find account with the provided email");
-      }
-      setInProgress(false);
-    }, 2000);
+    if (email !== "") {
+      setSuccess("");
+      setError("");
+      setInProgress(true);
+      setTimeout(() => {
+        if (email === "abc@test.com") {
+          setEmail("");
+          setSuccess("Reset password link has been sent to your email");
+        } else {
+          setError("Couldn't find account with the provided email");
+        }
+        setInProgress(false);
+      }, 2000);
+    }
   };
 
   return (
@@ -64,14 +66,17 @@ export default function ForgotCredentials() {
           name="email"
           rules={[
             {
+              type: "email",
+              message: "The input is not valid Email!",
+            },
+            {
               required: true,
-              message: "Please input your email!",
+              message: "Please input your Email!",
             },
           ]}
           style={{ marginBottom: "16px" }}
         >
           <Input
-            type="email"
             disabled={inProgress}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="john@example.com"
@@ -96,7 +101,7 @@ export default function ForgotCredentials() {
         style={{ color: "#968ef4" }}
         onClick={() => history.push("/")}
       >
-        <LeftOutlined /> Back to login
+        <LeftOutlined style={{ height: "0.75em" }} /> Back to login
       </Button>
     </CenteredCard>
   );

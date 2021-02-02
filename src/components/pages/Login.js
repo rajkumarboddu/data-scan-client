@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Typography, Form, Input, Alert } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
 
 import CenteredCard from "../core/CenteredCard";
 import CardButton from "../core/CardButton";
+import ACCESS_TOKEN from "../../utils/constants";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -14,18 +16,32 @@ export default function Login() {
   const history = useHistory();
   const { Title, Text } = Typography;
 
-  const onSubmit = () => {
-    setError("");
-    setInProgress(true);
-    setTimeout(() => {
-      if (username === "admin" && password === "admin") {
-        localStorage.setItem("accessToken", "some-random-access-token");
-        history.push("/dashboard");
-      } else {
-        setError("Invalid credentials");
+  const onSubmit = async () => {
+    if (username !== "" && password !== "") {
+      setError("");
+      setInProgress(true);
+      try {
+        const { data } = await axios.post("/api/auth/signin", {
+          username,
+          password,
+        });
+        if (data.accessToken) {
+          localStorage.setItem(ACCESS_TOKEN, data.accessToken);
+          // TODO :: save user info to store
+          history.push("/dashboard");
+        } else {
+          setError("Something went wrong!");
+          setInProgress(false);
+        }
+      } catch (err) {
         setInProgress(false);
+        if (err.code) {
+          setError("Invalid credentials");
+        } else {
+          setError("Something went wrong!");
+        }
       }
-    }, 2000);
+    }
   };
 
   return (
@@ -104,7 +120,6 @@ export default function Login() {
       <Link
         style={{ display: "block", textAlign: "center", color: "#968ef4" }}
         to="/forgot-password"
-        component={Typography.Link}
       >
         Forgot username/password
       </Link>
