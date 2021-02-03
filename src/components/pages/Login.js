@@ -3,10 +3,12 @@ import { Typography, Form, Input, Alert } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 
 import CenteredCard from "../core/CenteredCard";
 import CardButton from "../core/CardButton";
-import ACCESS_TOKEN from "../../utils/constants";
+import { ACCESS_TOKEN } from "../../utils/constants";
+import { setUser } from "../../store/actions/index";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -14,6 +16,7 @@ export default function Login() {
   const [inProgress, setInProgress] = useState(false);
   const [error, setError] = useState("");
   const history = useHistory();
+  const dispatch = useDispatch();
   const { Title, Text } = Typography;
 
   const onSubmit = async () => {
@@ -27,7 +30,13 @@ export default function Login() {
         });
         if (data.accessToken) {
           localStorage.setItem(ACCESS_TOKEN, data.accessToken);
-          // TODO :: save user info to store
+          dispatch(
+            setUser({
+              name: data.username,
+              email: data.email,
+              roles: data.roles,
+            })
+          );
           history.push("/dashboard");
         } else {
           setError("Something went wrong!");
