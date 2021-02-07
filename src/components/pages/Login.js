@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Typography, Form, Input, Alert } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useHistory } from "react-router-dom";
-import axios from "axios";
+import axios from "../../utils/axios";
 import { useDispatch } from "react-redux";
 
 import CenteredCard from "../core/CenteredCard";
@@ -30,13 +30,15 @@ export default function Login() {
         });
         if (data.accessToken) {
           localStorage.setItem(ACCESS_TOKEN, data.accessToken);
-          dispatch(
-            setUser({
-              name: data.username,
-              email: data.email,
-              roles: data.roles,
-            })
-          );
+          const userInfo = {
+            name: data.username,
+            email: data.email,
+            roles: data.roles,
+          };
+          // temporarily store user info in localstorage
+          console.log(JSON.stringify(userInfo));
+          localStorage.setItem("userInfo", JSON.stringify(userInfo));
+          dispatch(setUser(userInfo));
           history.push("/dashboard");
         } else {
           setError("Something went wrong!");

@@ -1,27 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import axios from "axios";
 import { Provider } from "react-redux";
 
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import store from "./store";
-
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
-axios.interceptors.request.use(
-  function (config) {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      config.headers.Authorization = accessToken;
-    }
-    return config;
-  },
-  function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-  }
-);
 
 ReactDOM.render(
   <React.StrictMode>
