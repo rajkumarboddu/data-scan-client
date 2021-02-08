@@ -24,7 +24,7 @@ function App() {
             <Route path="/forgot-password">
               <ForgotCredentials />
             </Route>
-            <PrivateRoute path="/dashboard" component={Dashboard} />
+            <PrivateRoute path="/supplier" component={Dashboard} />
           </Switch>
         </div>
       </ThemeProvider>

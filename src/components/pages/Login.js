@@ -39,7 +39,8 @@ export default function Login() {
           console.log(JSON.stringify(userInfo));
           localStorage.setItem("userInfo", JSON.stringify(userInfo));
           dispatch(setUser(userInfo));
-          history.push("/dashboard");
+          // this should be based on the role
+          history.push("/supplier");
         } else {
           setError("Something went wrong!");
           setInProgress(false);
