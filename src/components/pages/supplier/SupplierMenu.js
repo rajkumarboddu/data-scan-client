@@ -7,14 +7,14 @@ import {
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useState } from "react";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const menuItems = [
   {
-    key: "supplier",
+    key: "dashboard",
     displayName: "Dashboard",
     icon: <HomeOutlined />,
-    routePath: "",
+    routePath: "dashboard",
   },
   {
     key: "suppliers",
@@ -43,14 +43,12 @@ const menuItems = [
 ];
 
 const SupplierMenu = (props) => {
-  const [activeMenuKey, setActiveMenuKey] = useState([menuItems[0].key]);
-  console.log(menuItems.slice(0, 1));
+  const [activeMenuKey, setActiveMenuKey] = useState([menuItems[1].key]);
   const history = useHistory();
-  const { path } = useRouteMatch();
   const openPage = ({ key }) => {
     const { routePath } = menuItems.find((menuItem) => menuItem.key === key);
     setActiveMenuKey([key]);
-    history.push(`${path}/${routePath}`);
+    history.push(`/${routePath}`);
   };
 
   return (

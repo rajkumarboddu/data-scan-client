@@ -8,9 +8,11 @@ import { ThemeProvider } from "styled-components";
 import "antd/dist/antd.css";
 
 import Login from "./components/pages/Login";
-import Dashboard from "./components/pages/Dashboard";
 import ForgotCredentials from "./components/pages/ForgotCredentials";
 import { theme } from "./theme/index";
+import Suppliers from "./components/pages/supplier/Suppliers";
+
+const isAuthenticated = localStorage.getItem("accessToken");
 
 function App() {
   return (
@@ -18,13 +20,17 @@ function App() {
       <ThemeProvider theme={theme}>
         <div className="app">
           <Switch>
-            <Route exact path="/">
-              <Login />
-            </Route>
+            <Route
+              exact
+              path="/"
+              render={() =>
+                isAuthenticated ? <Redirect to="/suppliers" /> : <Login />
+              }
+            />
             <Route path="/forgot-password">
               <ForgotCredentials />
             </Route>
-            <PrivateRoute path="/supplier" component={Dashboard} />
+            <PrivateRoute path="/suppliers" component={Suppliers} />
           </Switch>
         </div>
       </ThemeProvider>
@@ -33,7 +39,6 @@ function App() {
 }
 
 function PrivateRoute({ component: Component, ...rest }) {
-  const isAuthenticated = localStorage.getItem("accessToken");
   return (
     <Route
       {...rest}
