@@ -12,9 +12,8 @@ import ForgotCredentials from "./components/pages/ForgotCredentials";
 import { theme } from "./theme/index";
 import Suppliers from "./components/pages/supplier/Suppliers";
 
-const isAuthenticated = localStorage.getItem("accessToken");
-
 function App() {
+  const isAuthenticated = localStorage.getItem("accessToken");
   return (
     <Router>
       <ThemeProvider theme={theme}>
@@ -39,6 +38,7 @@ function App() {
 }
 
 function PrivateRoute({ component: Component, ...rest }) {
+  const isAuthenticated = localStorage.getItem("accessToken");
   return (
     <Route
       {...rest}

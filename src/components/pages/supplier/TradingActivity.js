@@ -8,11 +8,13 @@ import {
   Select,
   Button,
   Table,
+  message,
 } from "antd";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
+import axios from "../../../utils/axios";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -39,24 +41,41 @@ const StyledVerticalDivider = styled(Divider)`
 
 const TradingActivity = () => {
   const [duration, setDuration] = useState();
+  const [loading, setLoading] = useState(false);
+  const [dataSource, setDataSource] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  const onDurationSubmit = () => {
-    console.log("Selected duration: ", duration);
+  const onDurationSubmit = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/api/trading/${duration * 30}`);
+      let source = [];
+      if (data?.DATA_DS?.G_1) {
+        source = data.DATA_DS.G_1.map((record) => ({
+          key: record.VENDOR_ID,
+          ...record,
+        }));
+      }
+      if (source.length === 0) {
+        message.info("Received empty results!");
+      }
+      setDataSource(source);
+      setSelectedRowKeys([]);
+      setLoading(false);
+    } catch (err) {
+      message.error("Unable to fetch records!");
+      setLoading(false);
+    }
   };
 
-  const dataSource = [];
   const columns = [
     {
-      title: "Select All",
-      dataIndex: "selectAll",
-    },
-    {
       title: "Supplier Number",
-      dataIndex: "supplierNumber",
+      dataIndex: "VENDOR_NUM",
     },
     {
       title: "Supplier Name",
-      dataIndex: "supplierName",
+      dataIndex: "VENDOR_NAME",
     },
     {
       title: "Supplier Site",
@@ -64,7 +83,7 @@ const TradingActivity = () => {
     },
     {
       title: "Purchase Orders Raised",
-      dataIndex: "purchaseOrdersRaised",
+      dataIndex: "OPEN_PO_AMOUNT",
     },
     {
       title: "Receipts Raised",
@@ -72,7 +91,7 @@ const TradingActivity = () => {
     },
     {
       title: "Invoices Raised",
-      dataIndex: "invoicesRaised",
+      dataIndex: "OPEN_INVOICE_AMOUNT",
     },
     {
       title: "Payments Made",
@@ -80,7 +99,7 @@ const TradingActivity = () => {
     },
     {
       title: "Last Trading Activity Date",
-      dataIndex: "lastTradingActivityDate",
+      dataIndex: "LAST_TRANSACTION_DATE",
     },
     {
       title: "Action",
@@ -113,7 +132,7 @@ const TradingActivity = () => {
           >
             <Select
               placeholder="Select Duration"
-              onChange={(value) => setDuration(value)}
+              onChange={(value) => setDuration(+value)}
               style={{ width: 150, marginRight: "25px" }}
             >
               <Option value="6">6 Months</Option>
@@ -121,7 +140,7 @@ const TradingActivity = () => {
               <Option value="18">18 Months</Option>
               <Option value="24">24 Months</Option>
             </Select>
-            <Button type="primary" onClick={onDurationSubmit}>
+            <Button loading={loading} type="primary" onClick={onDurationSubmit}>
               Submit
             </Button>
           </Col>
@@ -133,17 +152,25 @@ const TradingActivity = () => {
             marginTop: "25px",
           }}
         >
-          <Button type="primary" danger disabled={dataSource.length === 0}>
+          <Button
+            type="primary"
+            danger
+            disabled={dataSource.length === 0 || selectedRowKeys.length === 0}
+          >
             <PoweroffOutlined />
             Deactivate All
           </Button>
         </div>
         <Table
           bordered
-          rowSelection={{ type: "checkbox" }}
+          rowSelection={{
+            type: "checkbox",
+            onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
+          }}
           dataSource={dataSource}
           columns={columns}
           style={{ marginTop: "25px" }}
+          loading={loading}
         ></Table>
       </StyledCard>
     </>
