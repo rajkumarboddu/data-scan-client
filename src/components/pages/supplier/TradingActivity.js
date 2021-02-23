@@ -12,7 +12,7 @@ import {
 } from "antd";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import axios from "../../../utils/axios";
 
@@ -44,6 +44,7 @@ const TradingActivity = () => {
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const durationBtnRef = useRef();
 
   const onDurationSubmit = async () => {
     setLoading(true);
@@ -65,6 +66,18 @@ const TradingActivity = () => {
     } catch (err) {
       message.error("Unable to fetch records!");
       setLoading(false);
+    }
+  };
+
+  const deactivate = async () => {
+    console.log(selectedRowKeys);
+    try {
+      await axios.post("/api/deactivate", { VENDOR_IDs: selectedRowKeys });
+      message.success("Deactivated successfully");
+      setSelectedRowKeys([]);
+      durationBtnRef.current.click();
+    } catch (err) {
+      message.error("Something went wrong!");
     }
   };
 
@@ -140,7 +153,12 @@ const TradingActivity = () => {
               <Option value="18">18 Months</Option>
               <Option value="24">24 Months</Option>
             </Select>
-            <Button loading={loading} type="primary" onClick={onDurationSubmit}>
+            <Button
+              ref={durationBtnRef}
+              loading={loading}
+              type="primary"
+              onClick={onDurationSubmit}
+            >
               Submit
             </Button>
           </Col>
@@ -156,6 +174,7 @@ const TradingActivity = () => {
             type="primary"
             danger
             disabled={dataSource.length === 0 || selectedRowKeys.length === 0}
+            onClick={deactivate}
           >
             <PoweroffOutlined />
             Deactivate All
@@ -165,6 +184,7 @@ const TradingActivity = () => {
           bordered
           rowSelection={{
             type: "checkbox",
+            selectedRowKeys: selectedRowKeys,
             onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
           }}
           dataSource={dataSource}
