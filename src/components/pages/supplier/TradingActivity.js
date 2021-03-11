@@ -9,11 +9,13 @@ import {
   Button,
   Table,
   message,
+  Alert,
 } from "antd";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
+import zipcelx from "zipcelx";
 import axios from "../../../utils/axios";
 
 const { Title } = Typography;
@@ -44,7 +46,57 @@ const TradingActivity = () => {
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [deactivationSuccessMsg, setDeactivationSuccessMsg] = useState(null);
+  const reportRecords = useRef();
   const durationBtnRef = useRef();
+
+  const columns = [
+    {
+      title: "Supplier Number",
+      dataIndex: "VENDOR_NUM",
+      exportable: true,
+    },
+    {
+      title: "Supplier Name",
+      dataIndex: "VENDOR_NAME",
+      exportable: true,
+    },
+    {
+      title: "Supplier Site",
+      dataIndex: "supplierSite",
+      exportable: true,
+    },
+    {
+      title: "Purchase Orders Raised",
+      dataIndex: "OPEN_PO_AMOUNT",
+      exportable: true,
+    },
+    {
+      title: "Receipts Raised",
+      dataIndex: "receiptsRaised",
+      exportable: true,
+    },
+    {
+      title: "Invoices Raised",
+      dataIndex: "OPEN_INVOICE_AMOUNT",
+      exportable: true,
+    },
+    {
+      title: "Payments Made",
+      dataIndex: "paymentsMade",
+      exportable: true,
+    },
+    {
+      title: "Last Trading Activity Date",
+      dataIndex: "LAST_TRANSACTION_DATE",
+      exportable: true,
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      exportable: false,
+    },
+  ];
 
   const onDurationSubmit = async () => {
     setLoading(true);
@@ -70,55 +122,60 @@ const TradingActivity = () => {
   };
 
   const deactivate = async () => {
-    console.log(selectedRowKeys);
+    setDeactivationSuccessMsg(null);
+    reportRecords.current = null;
     try {
-      await axios.post("/api/deactivate", { VENDOR_IDs: selectedRowKeys });
-      message.success("Deactivated successfully");
-      setSelectedRowKeys([]);
-      durationBtnRef.current.click();
+      const { data } = await axios.post("/api/deactivate", {
+        VENDOR_IDs: selectedRowKeys,
+      });
+      const { success: deactivatedKeys } = data;
+      setDeactivationSuccessMsg(
+        `Successfully deactivated ${deactivatedKeys.length}/${selectedRowKeys.length}`
+      );
+
+      // save data to export till alert gets closed
+      const selectedRows = dataSource.filter((row) =>
+        selectedRowKeys.includes(row.key)
+      );
+      reportRecords.current = selectedRows.map((sRow) => ({
+        ...sRow,
+        status: deactivatedKeys.includes(sRow.key) ? "Deactivated" : "Active",
+      }));
     } catch (err) {
       message.error("Something went wrong!");
     }
   };
 
-  const columns = [
-    {
-      title: "Supplier Number",
-      dataIndex: "VENDOR_NUM",
-    },
-    {
-      title: "Supplier Name",
-      dataIndex: "VENDOR_NAME",
-    },
-    {
-      title: "Supplier Site",
-      dataIndex: "supplierSite",
-    },
-    {
-      title: "Purchase Orders Raised",
-      dataIndex: "OPEN_PO_AMOUNT",
-    },
-    {
-      title: "Receipts Raised",
-      dataIndex: "receiptsRaised",
-    },
-    {
-      title: "Invoices Raised",
-      dataIndex: "OPEN_INVOICE_AMOUNT",
-    },
-    {
-      title: "Payments Made",
-      dataIndex: "paymentsMade",
-    },
-    {
-      title: "Last Trading Activity Date",
-      dataIndex: "LAST_TRANSACTION_DATE",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-    },
-  ];
+  const exportToExcel = () => {
+    if (reportRecords.current) {
+      // transform
+      const exportableCols = columns.filter((col) => col.exportable);
+      const data = reportRecords.current.map((row) => {
+        const dataItem = exportableCols.map((col) => ({
+          value: `${row[col.dataIndex]}`,
+          type: "string",
+        }));
+        dataItem.push({ value: `${row.status}`, type: "string" });
+        return dataItem;
+      });
+      const headerRow = exportableCols.map((col) => ({
+        value: `${col.dataIndex}`,
+        type: "string",
+      }));
+      headerRow.push({ value: "Status", type: "string" });
+      data.unshift(headerRow);
+
+      const config = {
+        filename: `Deactivation-Report-${new Date().toLocaleString()}`,
+        sheet: {
+          data,
+        },
+      };
+      zipcelx(config);
+    } else {
+      message.error("Data is not available to export");
+    }
+  };
 
   return (
     <>
@@ -163,23 +220,38 @@ const TradingActivity = () => {
             </Button>
           </Col>
         </Row>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "25px",
-          }}
-        >
-          <Button
-            type="primary"
-            danger
-            disabled={dataSource.length === 0 || selectedRowKeys.length === 0}
-            onClick={deactivate}
+        <Row style={{ marginTop: "25px" }}>
+          <Col span={10}>
+            {deactivationSuccessMsg && (
+              <Alert
+                message={deactivationSuccessMsg}
+                type="success"
+                showIcon
+                action={
+                  <Button size="small" type="link" onClick={exportToExcel}>
+                    Download Report
+                  </Button>
+                }
+                closable
+                onClose={() => setDeactivationSuccessMsg(null)}
+              />
+            )}
+          </Col>
+          <Col
+            span={14}
+            style={{ display: "flex", justifyContent: "flex-end" }}
           >
-            <PoweroffOutlined />
-            Deactivate All
-          </Button>
-        </div>
+            <Button
+              type="primary"
+              danger
+              disabled={dataSource.length === 0 || selectedRowKeys.length === 0}
+              onClick={deactivate}
+            >
+              <PoweroffOutlined />
+              Deactivate All
+            </Button>
+          </Col>
+        </Row>
         <Table
           bordered
           rowSelection={{
