@@ -41,6 +41,16 @@ const StyledVerticalDivider = styled(Divider)`
   margin: 0px 15px;
 `;
 
+const StyledTable = styled(Table)`
+  & .ant-table-container {
+    overflow: auto;
+  }
+
+  & table {
+    font-size: 0.9em;
+  }
+`;
+
 const TradingActivity = () => {
   const [duration, setDuration] = useState();
   const [loading, setLoading] = useState(false);
@@ -62,8 +72,8 @@ const TradingActivity = () => {
       exportable: true,
     },
     {
-      title: "Supplier Site",
-      dataIndex: "supplierSite",
+      title: "Last Requisition Date",
+      dataIndex: "LAST_REQUISITION_DATE",
       exportable: true,
     },
     {
@@ -72,8 +82,13 @@ const TradingActivity = () => {
       exportable: true,
     },
     {
+      title: "Last PO Creation Date",
+      dataIndex: "LAST_PO_CREATION_DATE",
+      exportable: true,
+    },
+    {
       title: "Receipts Raised",
-      dataIndex: "receiptsRaised",
+      dataIndex: "RECEIPT_AMOUNT",
       exportable: true,
     },
     {
@@ -82,8 +97,18 @@ const TradingActivity = () => {
       exportable: true,
     },
     {
+      title: "Last Invoice Creation Date",
+      dataIndex: "LAST_INVOICE_CREATION_DATE",
+      exportable: true,
+    },
+    {
       title: "Payments Made",
-      dataIndex: "paymentsMade",
+      dataIndex: "PAYMENT_AMOUNT",
+      exportable: true,
+    },
+    {
+      title: "Last Payment Date",
+      dataIndex: "LAST_PAYMENT_DATE",
       exportable: true,
     },
     {
@@ -91,11 +116,12 @@ const TradingActivity = () => {
       dataIndex: "LAST_TRANSACTION_DATE",
       exportable: true,
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      exportable: false,
-    },
+    // commeting out for now
+    // {
+    //   title: "Action",
+    //   dataIndex: "action",
+    //   exportable: false,
+    // },
   ];
 
   const onDurationSubmit = async () => {
@@ -135,11 +161,13 @@ const TradingActivity = () => {
 
       // save data to export till alert gets closed
       const selectedRows = dataSource.filter((row) =>
-        selectedRowKeys.includes(row.key)
+        selectedRowKeys.some((sKey) => sKey == row.key)
       );
       reportRecords.current = selectedRows.map((sRow) => ({
         ...sRow,
-        status: deactivatedKeys.includes(sRow.key) ? "Deactivated" : "Active",
+        status: deactivatedKeys.some((dKey) => dKey == sRow.key)
+          ? "Deactivated"
+          : "Active",
       }));
     } catch (err) {
       message.error("Something went wrong!");
@@ -202,7 +230,10 @@ const TradingActivity = () => {
           >
             <Select
               placeholder="Select Duration"
-              onChange={(value) => setDuration(+value)}
+              onChange={(value) => {
+                setDuration(+value);
+                setDeactivationSuccessMsg("");
+              }}
               style={{ width: 150, marginRight: "25px" }}
             >
               <Option value="6">6 Months</Option>
@@ -252,18 +283,23 @@ const TradingActivity = () => {
             </Button>
           </Col>
         </Row>
-        <Table
-          bordered
-          rowSelection={{
-            type: "checkbox",
-            selectedRowKeys: selectedRowKeys,
-            onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
-          }}
-          dataSource={dataSource}
-          columns={columns}
-          style={{ marginTop: "25px" }}
-          loading={loading}
-        ></Table>
+        <Row>
+          <Col span={24} style={{ overflow: "auto" }}>
+            <StyledTable
+              bordered
+              rowSelection={{
+                type: "checkbox",
+                selectedRowKeys: selectedRowKeys,
+                onChange: (selectedRowKeys) =>
+                  setSelectedRowKeys(selectedRowKeys),
+              }}
+              dataSource={dataSource}
+              columns={columns}
+              style={{ marginTop: "25px" }}
+              loading={loading}
+            ></StyledTable>
+          </Col>
+        </Row>
       </StyledCard>
     </>
   );
