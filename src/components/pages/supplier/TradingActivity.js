@@ -161,10 +161,12 @@ const TradingActivity = () => {
 
       // save data to export till alert gets closed
       const selectedRows = dataSource.filter((row) =>
+        // eslint-disable-next-line eqeqeq
         selectedRowKeys.some((sKey) => sKey == row.key)
       );
       reportRecords.current = selectedRows.map((sRow) => ({
         ...sRow,
+        // eslint-disable-next-line eqeqeq
         status: deactivatedKeys.some((dKey) => dKey == sRow.key)
           ? "Deactivated"
           : "Active",
