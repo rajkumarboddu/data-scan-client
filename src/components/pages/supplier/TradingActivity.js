@@ -12,6 +12,7 @@ import {
   Alert,
 } from "antd";
 import styled from "styled-components";
+import moment from "moment";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
@@ -49,71 +50,207 @@ const StyledTable = styled(Table)`
   & table {
     font-size: 0.9em;
   }
+
+  & table thead th {
+    position: relative;
+
+    & .table-header-gutter {
+      position: absolute;
+      width: 5px;
+      right: -1px;
+      top: 0px;
+      height: 100%;
+      z-index: 9999;
+      user-select: none;
+      cursor: ew-resize;
+    }
+  }
 `;
+
+/*
+// Written for col resizing
+const HeaderCell = (props) => {
+  const pageXonMouseDownRef = useRef();
+  const headerContentRef = useRef();
+  const originalWidthRef = useRef();
+  const [width, setWidth] = useState();
+
+  const stopClickEvtPropagation = (evt) => {
+    evt.stopPropagation();
+  };
+
+  const onMouseMoveHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (pageXonMouseDownRef.current) {
+      const newWidth = e.pageX - pageXonMouseDownRef.current + width;
+      if (newWidth > originalWidthRef.current) {
+        setWidth(newWidth);
+      }
+    }
+  };
+
+  const mouseUpHandler = (e) => {
+    props.setTableScroll({ x: "100vw", y: 350 });
+    e.preventDefault();
+    e.stopPropagation();
+    pageXonMouseDownRef.current = null;
+    document.removeEventListener("mousemove", onMouseMoveHandler);
+    document.removeEventListener("mouseup", mouseUpHandler);
+    setTimeout(() => {
+      document.removeEventListener("click", stopClickEvtPropagation, {
+        capture: true,
+      });
+    }, 100);
+  };
+
+  useEffect(() => {
+    originalWidthRef.current = headerContentRef.current.offsetWidth;
+    setWidth(originalWidthRef.current);
+    return () => {
+      document.removeEventListener("mouseup", mouseUpHandler);
+      document.removeEventListener("mousemove", onMouseMoveHandler);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onMouseDownHandler = (e) => {
+    props.setTableScroll(undefined);
+    e.stopPropagation();
+    document.addEventListener("click", stopClickEvtPropagation, {
+      capture: true,
+    });
+    pageXonMouseDownRef.current = e.pageX;
+    document.addEventListener("mousemove", onMouseMoveHandler);
+    document.addEventListener("mouseup", mouseUpHandler);
+  };
+
+  return (
+    <div ref={headerContentRef} style={{ width: `${width}px` }}>
+      {props.children}
+      <div
+        className="table-header-gutter"
+        onMouseDown={onMouseDownHandler}
+      ></div>
+    </div>
+  );
+};
+*/
 
 const TradingActivity = () => {
   const [duration, setDuration] = useState();
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [deactivateInProgress, setDeactivateInProgress] = useState(false);
   const [deactivationSuccessMsg, setDeactivationSuccessMsg] = useState(null);
   const reportRecords = useRef();
   const durationBtnRef = useRef();
+
+  const sortFn = (dataIndex, type = "string") => {
+    switch (type) {
+      case "number": {
+        return (a, b) => {
+          return +a[dataIndex] - +b[dataIndex];
+        };
+      }
+      case "string":
+      default: {
+        return (a, b) => {
+          return `${a[dataIndex]}`.localeCompare(b[dataIndex]);
+        };
+      }
+    }
+  };
+
+  const dateFormatterRenderer = (value) => {
+    const momentObj = moment(value, "YYYY-MM-DD");
+    return {
+      children: momentObj.isValid() ? momentObj.format("DD-MM-YYYY") : value,
+    };
+  };
 
   const columns = [
     {
       title: "Supplier Number",
       dataIndex: "VENDOR_NUM",
       exportable: true,
+      sorter: sortFn("VENDOR_NUM"),
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Supplier Name",
       dataIndex: "VENDOR_NAME",
       exportable: true,
+      sorter: sortFn("VENDOR_NAME"),
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Last Requisition Date",
       dataIndex: "LAST_REQUISITION_DATE",
       exportable: true,
+      sorter: sortFn("LAST_REQUISITION_DATE"),
+      sortDirections: ["descend", "ascend"],
+      render: dateFormatterRenderer,
     },
     {
       title: "Purchase Orders Raised",
       dataIndex: "OPEN_PO_AMOUNT",
+      sorter: sortFn("OPEN_PO_AMOUNT", "number"),
+      sortDirections: ["descend", "ascend"],
       exportable: true,
     },
     {
       title: "Last PO Creation Date",
       dataIndex: "LAST_PO_CREATION_DATE",
       exportable: true,
+      render: dateFormatterRenderer,
+      sorter: sortFn("LAST_PO_CREATION_DATE"),
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Receipts Raised",
       dataIndex: "RECEIPT_AMOUNT",
+      sorter: sortFn("RECEIPT_AMOUNT", "number"),
+      sortDirections: ["descend", "ascend"],
       exportable: true,
     },
     {
       title: "Invoices Raised",
       dataIndex: "OPEN_INVOICE_AMOUNT",
+      sorter: sortFn("OPEN_INVOICE_AMOUNT", "number"),
+      sortDirections: ["descend", "ascend"],
       exportable: true,
     },
     {
       title: "Last Invoice Creation Date",
       dataIndex: "LAST_INVOICE_CREATION_DATE",
       exportable: true,
+      render: dateFormatterRenderer,
+      sorter: sortFn("LAST_INVOICE_CREATION_DATE"),
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Payments Made",
       dataIndex: "PAYMENT_AMOUNT",
+      sorter: sortFn("PAYMENT_AMOUNT", "number"),
+      sortDirections: ["descend", "ascend"],
       exportable: true,
     },
     {
       title: "Last Payment Date",
       dataIndex: "LAST_PAYMENT_DATE",
+      render: dateFormatterRenderer,
+      sorter: sortFn("LAST_PAYMENT_DATE"),
+      sortDirections: ["descend", "ascend"],
       exportable: true,
     },
     {
       title: "Last Trading Activity Date",
       dataIndex: "LAST_TRANSACTION_DATE",
+      render: dateFormatterRenderer,
+      sorter: sortFn("LAST_TRANSACTION_DATE"),
+      sortDirections: ["descend", "ascend"],
       exportable: true,
     },
     // commeting out for now
@@ -140,15 +277,16 @@ const TradingActivity = () => {
       }
       setDataSource(source);
       setSelectedRowKeys([]);
-      setLoading(false);
     } catch (err) {
       message.error("Unable to fetch records!");
+    } finally {
       setLoading(false);
     }
   };
 
   const deactivate = async () => {
     setDeactivationSuccessMsg(null);
+    setDeactivateInProgress(true);
     reportRecords.current = null;
     try {
       const { data } = await axios.post("/api/deactivate", {
@@ -159,6 +297,23 @@ const TradingActivity = () => {
         `Successfully deactivated ${deactivatedKeys.length}/${selectedRowKeys.length}`
       );
 
+      // uncheck deactivated rows
+      setSelectedRowKeys((currentSelectedRowKeys) => {
+        console.log(selectedRowKeys, deactivatedKeys);
+        return currentSelectedRowKeys.filter(
+          (rowKey) => !deactivatedKeys.includes(`${rowKey}`)
+        );
+      });
+      // disabled deactivated rows
+      setDataSource((currentDataSource) => {
+        return currentDataSource.map((row) => {
+          return {
+            ...row,
+            // eslint-disable-next-line eqeqeq
+            deactivationStatus: deactivatedKeys.some((dKey) => row.key == dKey),
+          };
+        });
+      });
       // save data to export till alert gets closed
       const selectedRows = dataSource.filter((row) =>
         // eslint-disable-next-line eqeqeq
@@ -173,6 +328,8 @@ const TradingActivity = () => {
       }));
     } catch (err) {
       message.error("Something went wrong!");
+    } finally {
+      setDeactivateInProgress(false);
     }
   };
 
@@ -279,6 +436,7 @@ const TradingActivity = () => {
               danger
               disabled={dataSource.length === 0 || selectedRowKeys.length === 0}
               onClick={deactivate}
+              loading={deactivateInProgress}
             >
               <PoweroffOutlined />
               Deactivate All
@@ -294,11 +452,16 @@ const TradingActivity = () => {
                 selectedRowKeys: selectedRowKeys,
                 onChange: (selectedRowKeys) =>
                   setSelectedRowKeys(selectedRowKeys),
+                getCheckboxProps: (record) => ({
+                  disabled: record.deactivationStatus,
+                }),
               }}
               dataSource={dataSource}
               columns={columns}
               style={{ marginTop: "25px" }}
               loading={loading}
+              pagination={false}
+              scroll={{ x: "100vw", y: 350 }}
             ></StyledTable>
           </Col>
         </Row>
