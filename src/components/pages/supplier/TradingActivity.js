@@ -10,6 +10,8 @@ import {
   Table,
   message,
   Alert,
+  Image,
+  Spin
 } from "antd";
 import styled from "styled-components";
 import moment from "moment";
@@ -18,6 +20,8 @@ import { useRef, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import zipcelx from "zipcelx";
 import axios from "../../../utils/axios";
+import excelDownloadIcon from "../../../static-assets/excel-download-icon.svg";
+import download from "downloadjs";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -66,6 +70,71 @@ const StyledTable = styled(Table)`
     }
   }
 `;
+
+const DownloadExcel = styled.div`
+  border: 0px solid #09743b;
+  display: flex;
+  align-items: center;
+  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+  justify-content: space-around;
+  margin-right: 15px;
+  cursor: pointer;
+  transition: 0.05s;
+
+  &:hover {
+    border-width: 0.5px;
+
+    .ant-image-img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &[disabled] {
+    background: #f5f5f5;
+    border-color: #d9d9d9;
+    opacity: 0.5;
+    border-width: 0.5px;
+
+    .ant-image-img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+`;
+
+const ExcelDownloadOption = (props) => {
+
+  const { duration } = props;
+  const [loading, setLoading] = useState(false);
+
+  const downloadExcel = async () => {
+    if(!duration) {
+      message.info("Please select the duration!");
+      return;
+    }
+    setLoading(true);
+    const durationInDays = duration * 30;
+    const resp = await axios.get(`/api/trading/download/${durationInDays}/tradingActivity.xlsm`, { responseType: "blob"});
+    const mimeType = resp.headers["content-type"] || "application/vnd.ms-excel.sheet.macroEnabled.12";
+    const fileName = resp.headers["content-disposition"]?.split(";")
+                      .filter(part => part.trim().startsWith("filename="))[0].trim()
+                      .replace("filename=", "") || `trading-activity-${durationInDays}days`;
+    download(resp.data, fileName, mimeType);
+    setLoading(false);
+  };
+  
+  return (
+    <>
+      { loading && <Spin style={{paddingTop: "6px", marginRight: "10px"}} /> }
+      <DownloadExcel onClick={downloadExcel} disabled={loading}>
+        <Image style={{}} preview={false} src={excelDownloadIcon} />
+      </DownloadExcel>
+    </>
+  )
+}
 
 /*
 // Written for col resizing
@@ -431,6 +500,7 @@ const TradingActivity = () => {
             span={14}
             style={{ display: "flex", justifyContent: "flex-end" }}
           >
+            { duration && <ExcelDownloadOption duration={duration} /> }
             <Button
               type="primary"
               danger

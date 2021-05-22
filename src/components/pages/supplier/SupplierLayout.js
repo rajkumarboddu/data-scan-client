@@ -15,13 +15,13 @@ const StyledSider = styled(Sider)`
 `;
 
 const StyledLayout = styled(Layout)`
-  background: ${(props) => props.bgColor || "#f8f8f8"};
+  background: ${(props) => props.bgcolor || "#f8f8f8"};
 `;
 
 const StyledHeader = styled(Header)`
   padding: 0px 25px;
-  background: ${(props) => props.bgColor || "#fff"};
-  ${(props) => (props.bgColor ? "" : props.theme.boxShadow)};
+  background: ${(props) => props.bgcolor || "#fff"};
+  ${(props) => (props.bgcolor ? "" : props.theme.boxShadow)};
 `;
 
 const StyledFooter = styled(Footer)`
@@ -65,8 +65,8 @@ export default function SupplierLayout(props) {
         <StyledLogo preview={false} src={logo} />
         <SupplierMenu />
       </StyledSider>
-      <StyledLayout bgColor={props.layoutBg}>
-        <StyledHeader bgColor={props.headerBg}>
+      <StyledLayout bgcolor={props.layoutBg}>
+        <StyledHeader bgcolor={props.headerBg}>
           <Row>
             <Col span={8} offset={16}>
               <div style={{ position: "relative" }}>

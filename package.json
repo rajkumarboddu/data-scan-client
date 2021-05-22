@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^12.6.2",
     "antd": "^4.12.2",
     "axios": "^0.21.1",
+    "downloadjs": "^1.4.7",
     "env-cmd": "^10.1.0",
     "moment": "^2.29.1",
     "react": "^17.0.1",
