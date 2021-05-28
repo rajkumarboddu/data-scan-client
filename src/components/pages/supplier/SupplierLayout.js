@@ -40,9 +40,7 @@ export default function SupplierLayout(props) {
   const history = useHistory();
   const logout = () => {
     localStorage.clear();
-    setTimeout(() => {
-      history.push("/");
-    }, 250);
+    history.push("/");
   };
   const userMenu = (
     <Menu>
